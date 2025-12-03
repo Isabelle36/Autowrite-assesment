@@ -18,7 +18,7 @@
 
 ## 📹 Demo
 - **Video walkthrough:** _Add your link here_  
-- **Live demo:** _Add your deployed URL here_
+- **Live demo:** https://autowrite-assesment.vercel.app/
 
 ---
 
