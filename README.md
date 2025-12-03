@@ -1,55 +1,69 @@
-## Features
-- Upload driver’s license or document (JPG, PNG, TXT, PDF)
-- Extracts text using AWS Textract
-- Smart parsing logic detects:
-  - First name
-  - Last name
-  - License number
-  - Date of birth
-  - Expiry date
-  - Address
-- Auto-fills form fields (editable)
-- Submit form to store data in Supabase
-- Top-of-page status toast shows progress (Analyzing → Success/Error)
+##  Features
+- Upload documents: **JPG, PNG, TXT, PDF**
+- Text extraction powered by **AWS Textract**
+- Fully **serverless** using Next.js API Routes
+- Smart parsing that identifies:
+  - First name  
+  - Last name  
+  - License number  
+  - Date of birth  
+  - Expiry date  
+  - Address  
+- Auto-filled form fields (editable by user)
+- Submit and store extracted data in **Supabase**
+- Top-page toast notifications for:
+  - *Analyzing → Success/Error*
+
+---
 
 ## 📹 Demo
-- Watch it in action: *(Add your video link here)*
-- Try the live version: *(Add your deployed URL here)*
+- **Video walkthrough:** _Add your link here_  
+- **Live demo:** _Add your deployed URL here_
+
+---
 
 ## 🛠️ Tech Stack
-- Next.js 
-- TypeScript
-- TailwindCSS
-- AWS Textract
-- Supabase
+- **Next.js**
+- **TypeScript**
+- **Tailwind CSS**
+- **AWS Textract**
+- **Supabase**
+
+---
 
 ## ⚙️ Setup Instructions
-1. **Clone the repo**
-   ```sh
-git clone https://github.com/your-username/your-repo-name.git
-cd your-repo-name
-   ```
-2. **Install dependencies**
-   ```sh
+
+### 1. Clone the repository
+```sh
+git clone https://github.com/Isabelle36/Autowrite-assesment.git
+cd Autowrite-assesment
+```
+
+### 2. Install dependencies
+```sh
 npm install
-   ```
-3. **Configure environment variables**
-   Create a `.env` file in your project root:
-   ```env
+```
+
+### 3. Add environment variables  
+Create a `.env` file in the project root:
+
+```env
 AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY
 AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
 AWS_REGION=us-east-1
 NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
 SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY
-   ```
-   *Note: AWS Textract works best in `us-east-1`.*
+```
 
-4. **Set up AWS Textract**
-   - Follow this guide which i used [CloudThat: Extract Data from an Image using AWS Textract](https://cloudthat.com/resources/blog/extract-data-from-an-image-using-aws-textract/)
+> **Note:** AWS Textract performs best in `us-east-1`.
 
-5. **Create a Supabase table**
-   ```sql
-create table driving_licenses (
+### 4. Configure AWS Textract  
+Follow this guide (which i also did) to setup your AWS:  
+[CloudThat – Extract Data from an Image using AWS Textract](https://cloudthat.com/resources/blog/extract-data-from-an-image-using-aws-textract/)
+
+### 5. Create a database in Supabase then create a table by running this in sql
+```sql
+create table document_licenses (
   id uuid default uuid_generate_v4() primary key,
   first_name text,
   last_name text,
@@ -59,13 +73,17 @@ create table driving_licenses (
   address text,
   created_at timestamp default now()
 );
-   ```
+```
 
-6. **Run the app locally**
-   ```sh
+### 6. Run the development server
+```sh
 npm run dev
-   ```
-   Then open [http://localhost:3000](http://localhost:3000)
+```
+
+Open your browser at:  
+http://localhost:3000
+
+---
 
 ## 🗂️ Project Structure
 ```
@@ -77,7 +95,7 @@ assesment/
 │   │   ├── textextract/       # Handles AWS Textract extraction logic
 │   │   │   └── route.ts
 │   ├── layout.tsx             # App layout
-│   └── page.tsx               # Main page with upload + form
+│   └── page.tsx               
 │
 ├── components/
 │   ├── DocumentCard.tsx       # Card UI for uploaded documents
@@ -97,21 +115,25 @@ assesment/
 ├── public/                    # Static assets (icons, images, logos)
 │
 ├── .env                       # Environment variables
-├── next.config.ts              # Next.js config
+├── next.config.ts             # Next.js config
 ├── package.json
 └── tsconfig.json
-
+```
+## How It Works
 ```
 
-## 🧠 How it works
-- **Upload:**
-  - File sent to `/api/textextract`
-  - AWS Textract extracts text
-  - Smart cleaning function (`extractCleanData`) detects key fields
-  - Cleaned data auto-fills form fields
-- **Submit:**
-  - Form data sent to `/api/submitform`
-  - Backend stores it in Supabase
+1. Upload Flow
 
----
-Feel free to open issues or contribute!
+- File is sent to `/api/textextract`
+- AWS Textract extracts raw text
+- `extractCleanData` parses and maps fields:
+  - Name  
+  - DOB  
+  - Address  
+  - License number  
+  - Expiry date  
+- Cleaned data auto-populates the UI form
+
+2. Form Submission
+- Form data sent to `/api/submitform`
+- Saved securely in **Supabase**
