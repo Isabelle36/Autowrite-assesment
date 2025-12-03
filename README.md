@@ -1,36 +1,117 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Features
+- Upload driver’s license or document (JPG, PNG, TXT, PDF)
+- Extracts text using AWS Textract
+- Smart parsing logic detects:
+  - First name
+  - Last name
+  - License number
+  - Date of birth
+  - Expiry date
+  - Address
+- Auto-fills form fields (editable)
+- Submit form to store data in Supabase
+- Top-of-page status toast shows progress (Analyzing → Success/Error)
 
-## Getting Started
+## 📹 Demo
+- Watch it in action: *(Add your video link here)*
+- Try the live version: *(Add your deployed URL here)*
 
-First, run the development server:
+## 🛠️ Tech Stack
+- Next.js 
+- TypeScript
+- TailwindCSS
+- AWS Textract
+- Supabase
 
-```bash
+## ⚙️ Setup Instructions
+1. **Clone the repo**
+   ```sh
+git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name
+   ```
+2. **Install dependencies**
+   ```sh
+npm install
+   ```
+3. **Configure environment variables**
+   Create a `.env` file in your project root:
+   ```env
+AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY
+AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
+AWS_REGION=us-east-1
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY
+   ```
+   *Note: AWS Textract works best in `us-east-1`.*
+
+4. **Set up AWS Textract**
+   - Follow this guide which i used [CloudThat: Extract Data from an Image using AWS Textract](https://cloudthat.com/resources/blog/extract-data-from-an-image-using-aws-textract/)
+
+5. **Create a Supabase table**
+   ```sql
+create table driving_licenses (
+  id uuid default uuid_generate_v4() primary key,
+  first_name text,
+  last_name text,
+  license_no text unique,
+  expiry_date text,
+  dob text,
+  address text,
+  created_at timestamp default now()
+);
+   ```
+
+6. **Run the app locally**
+   ```sh
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+   ```
+   Then open [http://localhost:3000](http://localhost:3000)
+
+## 🗂️ Project Structure
+```
+assesment/
+├── app/
+│   ├── api/
+│   │   ├── submitform/        # Handles saving form data to Supabase
+│   │   │   └── route.ts
+│   │   ├── textextract/       # Handles AWS Textract extraction logic
+│   │   │   └── route.ts
+│   ├── layout.tsx             # App layout
+│   └── page.tsx               # Main page with upload + form
+│
+├── components/
+│   ├── DocumentCard.tsx       # Card UI for uploaded documents
+│   ├── DocumentSection.tsx    # Main component handling upload & form logic
+│   ├── FileUpload.tsx         # File upload handler (drag & drop)
+│   ├── FormSection.tsx        # Form UI for user details
+│   ├── Navbar.tsx             # Top navigation bar
+│   ├── UploadStatusToast.tsx  # Upload & analysis status indicator
+│   └── ui/                    # Reusable UI components (buttons, alerts, etc.)
+│
+├── lib/
+│   ├── extractCleanData.ts    # Cleans & maps Textract data to usable fields
+│   ├── supabase.ts            # Supabase client setup
+│   ├── types.ts               # Shared TypeScript types
+│   └── utils.ts               # Helper utilities
+│
+├── public/                    # Static assets (icons, images, logos)
+│
+├── .env                       # Environment variables
+├── next.config.ts              # Next.js config
+├── package.json
+└── tsconfig.json
+
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🧠 How it works
+- **Upload:**
+  - File sent to `/api/textextract`
+  - AWS Textract extracts text
+  - Smart cleaning function (`extractCleanData`) detects key fields
+  - Cleaned data auto-fills form fields
+- **Submit:**
+  - Form data sent to `/api/submitform`
+  - Backend stores it in Supabase
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+Feel free to open issues or contribute!

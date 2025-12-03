@@ -1,31 +1,17 @@
-import React from "react";
-import { Info } from "lucide-react"; 
+import React, { useState } from "react";
+import { Info, CheckCircle2, XCircle, Loader } from "lucide-react";
+import { Alert } from "./ui/alert";
+import type { FormSectionProps } from "@/lib/types";
 
-type FormSectionProps = {
-  formData: {
-    firstName: string;
-    lastName: string;
-    licenseNo: string;
-    expiryDate: string;
-    address: string;
-    dob: string;
-  };
-  setFormData: React.Dispatch<
-    React.SetStateAction<{
-      firstName: string;
-      lastName: string;
-      licenseNo: string;
-      expiryDate: string;
-      address: string;
-      dob: string;
-    }>
-  >;
-};
 
 export const FormSection: React.FC<FormSectionProps> = ({
   formData,
   setFormData,
 }) => {
+  const [alert, setAlert] = useState<
+    | { type: 'success' | 'error' | 'loading'; message: string }
+    | null
+  >(null);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -38,7 +24,57 @@ export const FormSection: React.FC<FormSectionProps> = ({
         We need some additional information that may be missing from your documents.
       </p>
 
-      <form className="space-y-6">
+      {alert && (
+        <div className="fixed top-4 left-1/2 z-50 -translate-x-1/2 w-full flex justify-center pointer-events-none">
+          <div className="pointer-events-auto">
+            <Alert
+              variant={
+                alert.type === 'success'
+                  ? 'success'
+                  : alert.type === 'error'
+                  ? 'error'
+                  : 'info'
+              }
+              icon={
+                alert.type === 'loading' ? (
+                  <Loader className="animate-spin text-blue-600" />
+                ) : alert.type === 'success' ? (
+                  <CheckCircle2 className="text-green-600" />
+                ) : (
+                  <XCircle className="text-red-600" />
+                )
+              }
+              isNotification
+              className="mb-4 min-w-[260px]"
+            >
+              {alert.message}
+            </Alert>
+          </div>
+        </div>
+      )}
+      <form className="space-y-6"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setAlert({ type: 'loading', message: 'Submitting the form...' });
+          try {
+            const res = await fetch("/api/submitform", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(formData),
+            });
+            const data = await res.json();
+            if (!res.ok || !data.success) {
+              setAlert({ type: 'error', message: data.error || 'Something went wrong.' });
+              return;
+            }
+            setAlert({ type: 'success', message: 'Form submitted successfully!' });
+            setFormData({ firstName: '', lastName: '', licenseNo: '', expiryDate: '', address: '', dob: '' });
+            setTimeout(() => setAlert(null), 3000);
+          } catch (err) {
+            setAlert({ type: 'error', message: 'Something went wrong while saving form data.' });
+          }
+        }}
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col">
             <label className="text-sm text-gray-700 font-medium mb-2 flex items-center gap-1">
