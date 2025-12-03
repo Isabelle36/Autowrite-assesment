@@ -17,7 +17,7 @@
 ---
 
 ## 📹 Demo
-- **Video walkthrough:** https://youtu.be/zf9fh33qksc?si=6gVqObwRJOkkcjzb)  
+- **Video walkthrough:** https://youtu.be/zf9fh33qksc?si=6gVqObwRJOkkcjzb
 - **Live demo:** https://autowrite-assesment.vercel.app/
 
 ---
