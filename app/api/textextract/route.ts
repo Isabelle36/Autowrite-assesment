@@ -22,6 +22,20 @@ export async function POST(req: Request) {
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
+    if (file.type === "text/plain") {
+  // Handle plain text file manually
+  const text = await file.text();
+
+  // Example: parse key=value pairs
+  const keyValuePairs: Record<string, string> = {};
+  text.split(/\r?\n/).forEach(line => {
+    const [key, value] = line.split("=").map(s => s?.trim());
+    if (key && value) keyValuePairs[key] = value;
+  });
+
+  return NextResponse.json({ success: true, keyValuePairs });
+}
+
 
     const bytes = Buffer.from(await file.arrayBuffer());
 

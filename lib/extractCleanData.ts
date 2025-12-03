@@ -18,8 +18,13 @@ export function extractCleanData(fields: Record<string, string>) {
   }
 
   function toHtmlDate(str: string) {
-    const match = str.match(/^(\d{2})[\/.](\d{2})[\/.](\d{4})$/);
-    return match ? `${match[3]}-${match[1]}-${match[2]}` : "";
+    // Accept dd-mm-yyyy, dd.mm.yyyy, dd/mm/yyyy, d-m-yyyy, etc.
+    const match = str.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})$/);
+    if (!match) return "";
+    // Pad day/month to 2 digits
+    const day = match[1].padStart(2, '0');
+    const month = match[2].padStart(2, '0');
+    return `${match[3]}-${month}-${day}`;
   }
 
   // --- main logic ---
@@ -50,8 +55,15 @@ export function extractCleanData(fields: Record<string, string>) {
     if (year < currentYear - 16 && !dob) dob = date;
     else if (year >= currentYear && !expiryDate) expiryDate = date;
   }
+  // Prefer direct key lookup for DOB and EXP
+  if (!dob && cleanedFields["DOB"]) dob = cleanedFields["DOB"];
+  if (!expiryDate && cleanedFields["EXP"]) expiryDate = cleanedFields["EXP"];
   if (!expiryDate) expiryDate = findValue(["EXP", "EXPI"]);
   if (!dob) dob = findValue(["DOB", "BIRTH"]);
+
+  // Always convert to HTML date format
+  dob = toHtmlDate(dob);
+  expiryDate = toHtmlDate(expiryDate);
   // NAME DETECTION
   let firstName = "";
   let lastName = "";
@@ -79,5 +91,5 @@ export function extractCleanData(fields: Record<string, string>) {
   const addressMatch = flatText.match(/\d+\s+[\w\s,]+(ST|RD|ROAD|STREET|AVE|BLVD|CA|TX|NY|MI|WA|FL|OH|IL|PA)/i);
   if (addressMatch) address = clean(addressMatch[0]);
   address = address.replace(new RegExp(`${firstName}|${lastName}`, "gi"), "").replace(/\s+/g, " ").trim();
-  return { firstName, lastName, licenseNo, expiryDate: toHtmlDate(expiryDate), dob: toHtmlDate(dob), address };
+  return { firstName, lastName, licenseNo, expiryDate, dob, address };
 }

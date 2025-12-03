@@ -55,6 +55,12 @@ export const FormSection: React.FC<FormSectionProps> = ({
       <form className="space-y-6"
         onSubmit={async (e) => {
           e.preventDefault();
+          const emptyField = Object.entries(formData).find(([_, v]) => !v.trim());
+          if (emptyField) {
+            setAlert({ type: 'error', message: `Please fill in the ${emptyField[0]} field.` });
+            setTimeout(() => setAlert(null), 2000);
+            return;
+          }
           setAlert({ type: 'loading', message: 'Submitting the form...' });
           try {
             const res = await fetch("/api/submitform", {
@@ -65,6 +71,7 @@ export const FormSection: React.FC<FormSectionProps> = ({
             const data = await res.json();
             if (!res.ok || !data.success) {
               setAlert({ type: 'error', message: data.error || 'Something went wrong.' });
+              setTimeout(() => setAlert(null), 2000);
               return;
             }
             setAlert({ type: 'success', message: 'Form submitted successfully!' });
@@ -72,6 +79,7 @@ export const FormSection: React.FC<FormSectionProps> = ({
             setTimeout(() => setAlert(null), 3000);
           } catch (err) {
             setAlert({ type: 'error', message: 'Something went wrong while saving form data.' });
+            setTimeout(() => setAlert(null), 2000);
           }
         }}
       >
